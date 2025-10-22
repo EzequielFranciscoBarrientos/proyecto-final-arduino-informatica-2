@@ -1,0 +1,176 @@
+#include <LiquidCrystal.h>
+
+// C++ code
+//
+#include <Keypad.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+
+const byte FILAS = 4; 
+const byte COLUMNAS = 4; 
+LiquidCrystal_I2C lcd(0x27, 16, 2); 
+
+//Lector
+String mensaje = "";
+
+char teclas[FILAS][COLUMNAS] = {
+  {'1','2','3','A'},
+  {'4','5','6','B'},
+  {'7','8','9','C'},
+  {'*','0','#','D'}
+};
+byte pinesFilas[FILAS] = {9, 8, 7, 6};     // R1, R2, R3, R4
+byte pinesColumnas[COLUMNAS] = {5, 4, 3, 2}; // C1, C2, C3, C4
+
+Keypad teclado = Keypad(makeKeymap(teclas), pinesFilas, pinesColumnas, FILAS, COLUMNAS);
+const int MAX_LEN = 6;             // longitud máxima de código aceptada
+const unsigned long TIMEOUT_MS = 10000UL;
+
+String entrada = "";                // lo que el usuario va ingresando
+unsigned long ultimaActividad = 0;  // para timeout
+
+const int N_CODIGOS = 3;
+String codigos[N_CODIGOS] = {
+  "1234",   // código 0
+  "2580",   // código 1
+  "9876"    // código 2
+};
+
+
+void setup()
+{
+  pinMode(10, OUTPUT);
+  pinMode(11, OUTPUT);
+  pinMode(12, OUTPUT);
+  
+  lcd.init();       // inicializa LCD
+  lcd.backlight();  // enciende la luz de fondo
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Sistema listo");
+  lcd.setCursor(0, 1);
+  lcd.print("Ingrese codigo");
+
+  teclado.setDebounceTime(50);  // anti-rebote
+  teclado.setHoldTime(1000);    // tiempo de pulsación larga opcional
+
+  Serial.println("Sistema de codigos multiple con LCD listo.");
+  
+  pinMode(LED_BUILTIN, OUTPUT);
+  Serial.begin(9600);teclado.setDebounceTime(50); // ajuste anti-rebote
+  teclado.setHoldTime(1000);   // tiempo para detectar "hold" si lo necesitás
+delay(1000);
+  lcd.clear();
+  }
+
+void loop()
+{
+  if (entrada.length() > 0 && (millis() - ultimaActividad) > TIMEOUT_MS) {
+    lcd.clear();
+    lcd.print("tiempo terminado");
+    entrada = "";
+     delay(1000);
+    lcd.clear();
+    lcd.print("Ingrese codigo");
+  }
+
+  
+  char k = teclado.getKey();
+
+  if (k) {  
+    ultimaActividad = millis();
+    
+
+    if (k == '#') {              // confirmar
+      verificarCodigo();
+    } 
+    else if (k == '*') {         // borrar entrada
+      entrada = "";
+      lcd.clear();
+      lcd.print("Codigo borrado");
+      delay(1000);
+      lcd.clear();
+      lcd.print("Ingrese codigo");
+    } 
+    
+    else if ((k >= '0' && k <= '9') || (k >= 'A' && k <= 'D')) {
+      if (entrada.length() < MAX_LEN) {
+        entrada += k;
+        lcd.setCursor(0, 1);
+        lcd.print(entrada); 
+      } else {
+        lcd.setCursor(1, 0);
+        lcd.print("caracteres max");
+      delay(500);
+        entrada = "";
+        lcd.clear();
+      lcd.print("Codigo borrado");
+      delay(1000);
+      lcd.clear();
+      lcd.print("Ingrese codigo");
+      }
+    }
+  }
+} 
+  
+  void verificarCodigo() {
+  
+    
+  lcd.clear();
+  lcd.print("Verificando...");
+  delay(500);
+    
+
+  if (entrada.length() == 0) {
+    return;
+  }
+
+  bool encontrado = false;
+  for (int i = 0; i < N_CODIGOS; ++i) {
+    if (entrada == codigos[i]) {
+      encontrado = true;
+      Serial.write(i);
+      break;
+    }
+  }
+
+ lcd.clear();
+  if (encontrado) {
+    lcd.print("Codigo Correcto");
+
+
+//lector: parte añadida, si el codigo es correcto se implementa lo siguiente
+   delay(1000);
+   lcd.clear();
+   lcd.setCursor(0, 0);
+   lcd.print("Aproxime tarjeta");
+   lcd.setCursor(0, 1);
+   lcd.print("o llavero");
+
+   if(Serial.available()){   //Si hay algo disponible en el monitor serie
+    mensaje = Serial.readStringUntil('\n');  // La cadena mensaje seria igual a cada linea impresa en el monitor serie
+    if(mensaje.startsWith("Saldo")){ //Si alguna linea empieza con saldo, se imprime en el LCD el mensaje completo de esa linea
+        lcd.clear();
+        delay(1000);
+        lcd.setCursor(0,0);
+        lcd.print(mensaje);
+    }
+    if(mensaje.startsWith("Pago")){ //Pasaria lo mismo el mensaje leido empieza con pago
+        lcd.clear();
+        delay(1000);
+        lcd.setCursor(0,0);
+        lcd.print(mensaje);
+    }
+   }
+   
+
+
+  } else {
+    lcd.print("Codigo Incorrecto");
+  }
+
+  delay(1500); 
+  lcd.clear();  
+  entrada = ""; // reiniciamos la entrada siempre después de confirmar
+}
