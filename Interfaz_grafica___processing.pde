@@ -1,11 +1,9 @@
-import processing.serial.*;    // 1. Importa la librería de comunicación serial de Processing.
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-// 6. Importa ArrayList para el buffer de ventas en memoria.
-
+import processing.serial.*;   // 1. Importa la librería de comunicación serial de Processing.
+import java.io.FileWriter;  // 2. Importa la clase para escribir datos en archivos.
+import java.io.IOException;  // 3. Importa la clase para manejar errores de entrada/salida.
+import java.util.Date;    // 4. Importa la clase para obtener la fecha y hora actual.
+import java.text.SimpleDateFormat;  // 5. Importa la clase para dar formato a la fecha y hora.
+import java.util.ArrayList;  // 6. Importa ArrayList para el buffer de ventas en memoria.
 
 Serial myPort;
 String mensaje = "";
@@ -16,30 +14,23 @@ int tiempoInicio=0;
 int rectX = 100;
 int rectY = 150;
 int pantalla=0;
-// 0:Principal, 1:Stock, 2:Ingreso Stock, 3:Saldo, 4:Ingreso Saldo, 5:Ventas (Tabla), 6:Cargar Archivo
 
 int productoSeleccionado = 0;
 String cantidadIngresada = "";
-// int tarjetadesignada=0; // ELIMINADO
-int usuarioSeleccionadoParaSaldo = -1; // NUEVO
+int usuarioSeleccionadoParaSaldo = -1; 
 
 //Usuarios registrados
 int ingresaruid;
 String nombre = "";
 String UID = "";
 String indiceEliminar = "";
-
-// 🔄 CAMBIO CLAVE: Reemplazo de los ArrayLists de nombres y uids
 ArrayList<Usuario> usuarios = new ArrayList<Usuario>();
 
 
 int stockActual1=0;
 int stockActual2=0;
-// Nombre del archivo de registro
-String nombreArchivo = "registro_ventas.txt";
-// Define los nombres de los productos para el registro
-final String[] PRODUCTOS = {"Producto 1 - $2000", "Producto 2 - $1000"};
-// === NUEVAS VARIABLES PARA EL FLUJO DE DATOS SOLICITADO ===
+String nombreArchivo = "registro_ventas.txt"; // Nombre del archivo de registro
+final String[] PRODUCTOS = {"Producto 1 - $2000", "Producto 2 - $1000"}; // Define los nombres de los productos para el registro
 // Este ArrayList mantiene las ventas de la sesión actual O el historial cargado.
 ArrayList<String> registrosEnMemoria = new ArrayList<String>();
 boolean archivoCargado = false; // Bandera para la pantalla 6.
@@ -56,8 +47,8 @@ void setup() {
   rectY = height/8;
   background(200, 200, 200);
 
-  println(Serial.list());
-  myPort = new Serial(this, "COM5", 9600);
+  //println(Serial.list());
+  //myPort = new Serial(this, "COM5", 9600);
  
   tiempoInicio = millis();
 }
@@ -85,26 +76,19 @@ void draw() {
     pantallaIngresostock();
   } else if (pantalla==3) {
     seleccionarUsuarioSaldo();
-// CAMBIO
   } else if (pantalla==4) {
     pantallaIngresosaldo();
   } else if (pantalla==5) {
     archivo();
-  // Pantalla de VENTAS (Tabla de registrosEnMemoria)
   } else if (pantalla==6) {
     pantallaCargarArchivo();
-// Pantalla de CARGAR ARCHIVO
-  }
-   else if (pantalla==7) {
+  }else if (pantalla==7) {
     usuarios();
-  }
-   else if (pantalla==8) {
+  } else if (pantalla==8) {
     añadirusuario();
-  }
-  else if (pantalla==9) {
+  } else if (pantalla==9) {
     eliminarusuario();
-  }
-  else if (pantalla==10){
+  } else if (pantalla==10){
   stockcuadro();
   }
 }
@@ -135,20 +119,16 @@ void botones() {
 // ===============================================
 // MANEJO DE CLICS
 // ===============================================
-
 void mousePressed() {
   if (pantalla==0) {
     // Botón 1: CARGAR SALDO (i=0)
     if (mouseX > rectX + (0 * 150) && mouseX < rectX + (0 * 150) + 130 &&
-      mouseY > rectY+110 && mouseY < rectY + 40+110) {
-      
+      mouseY > rectY+110 && mouseY < rectY + 40+110) { 
       usuarioSeleccionadoParaSaldo = -1;
       cantidadIngresada = "";
       pantalla=3;
     }
-
     // Botón 2: STOCK (i=1)
-    
     if (mouseX > rectX + (1 * 150) && mouseX < rectX + (1 * 150) + 130 &&
       mouseY > rectY+110 && mouseY < rectY + 40+110) {
       stock();
@@ -198,21 +178,15 @@ void mousePressed() {
       pantalla = 0;
     }
   } else if (pantalla==3) { 
-    
-    // Revisar clics en la lista de usuarios
-// 🔄 CAMBIO: Uso de usuarios.size()
     for (int i = 0; i < usuarios.size(); i++) {
       int yBoton = 100 + (i * 40);
       if (mouseX > 100 && mouseX < 100 + 400 &&
           mouseY > yBoton && mouseY < yBoton + 35) {
             
-        usuarioSeleccionadoParaSaldo = i;
-// Guardamos el índice del usuario
+        usuarioSeleccionadoParaSaldo = i;  // Guardamos el índice del usuario
         cantidadIngresada = "";
-        pantalla = 4;
-// Vamos a la pantalla de ingreso de monto
-        break;
-// Salimos del loop
+        pantalla = 4;  // Vamos a la pantalla de ingreso de monto
+        break;    // Salimos del loop
       }
     }
     
@@ -324,18 +298,13 @@ void keyPressed() {
         cantidadIngresada = cantidadIngresada.substring(0, cantidadIngresada.length() - 1);
       }
     } else if (key == ENTER || key == RETURN) {
-      
       // Solo enviar si hay un monto y un usuario seleccionado
-//  CAMBIO: Uso de usuarios.size()
       if (cantidadIngresada.length() > 0 && usuarioSeleccionadoParaSaldo != -1 && usuarioSeleccionadoParaSaldo < usuarios.size()) {
-        
         // Obtenemos la UID del usuario seleccionado
-//  CAMBIO: Acceso a la propiedad 'uid' del objeto Usuario
         String uid = usuarios.get(usuarioSeleccionadoParaSaldo).uid;
         uid = uid.replace(" ", "").toUpperCase(); // Limpiamos la UID
-        
         String monto = cantidadIngresada;
-// Formato del comando: "ADDSALDO:UID:MONTO\n"
+        // Formato del comando: "ADDSALDO:UID:MONTO\n"
         String mensajeFinal = "ADDSALDO:" + uid + ":" + monto + "\n";
         myPort.write(mensajeFinal);
         println("Enviando comando de saldo: " + mensajeFinal);
@@ -359,7 +328,6 @@ else if (pantalla == 8) { // AÑADIR USUARIO
     if ((key >= 'A' && key <= 'Z') || (key >= 'a' && key <= 'z') || key == ' ') {
       nombre += key;
     } else if (key == BACKSPACE && nombre.length() > 0) {
-   
       nombre = nombre.substring(0, nombre.length() - 1);
     } else if (key == ENTER || key == RETURN) {
       ingresaruid = 1;
@@ -377,13 +345,10 @@ else if (pantalla == 8) { // AÑADIR USUARIO
     
     else if (key == ENTER || key == RETURN) {
   
-//  CAMBIO CLAVE: Se crea un objeto Usuario y se añade a la lista
+// Se crea un objeto Usuario y se añade a la lista
       usuarios.add(new Usuario(nombre, UID));
-      
-      // CAMBIO: Esta es la forma correcta de enviar el comando
       myPort.write("UID:" + UID + "\n");
-      println("Enviando UID: " + UID);
-      
+      println("Enviando UID: " + UID);    
       nombre = "";
       UID = "";
       ingresaruid = 0;
@@ -405,23 +370,15 @@ else if (pantalla == 9) { // ELIMINAR USUARIO
     int numero = int(indiceEliminar);
     int i = numero - 1;  // índice real (0-based)
     
-//  CAMBIO: Uso de usuarios.size()
+
     if (i >= 0 && i < usuarios.size()) {
-      // Obtenemos la UID que vamos a eliminar
-//  CAMBIO: Acceso a la propiedad 'uid' antes de eliminar
+      // Obtenemos la UID que vamos a eliminar y accedemos a la propiedad 'uid' antes de eliminar
       String uidAEliminar = usuarios.get(i).uid;
-//  CAMBIO CLAVE: Solo se elimina un elemento de la lista 'usuarios'
       usuarios.remove(i);
-      
-// Enviar UID al Arduino para que la borre
       uidAEliminar = uidAEliminar.replace(" ", "").toUpperCase();
-// limpieza por si acaso
-      
-      // CAMBIO: Añadimos el "\n" (salto de línea) al final.
       myPort.write("DELUID:" + uidAEliminar + "\n");
-      
       println("UID eliminada localmente y enviada al Arduino: " + uidAEliminar);
-// Volver al menú principal de usuarios
+      // Volver al menú principal de usuarios
       indiceEliminar = "";
       pantalla = 7;
     } 
