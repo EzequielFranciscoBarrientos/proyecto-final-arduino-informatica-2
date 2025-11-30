@@ -1,5 +1,3 @@
-
-// ===============================================
 // CLASE USUARIO (AÑADIDA)
 // ===============================================
 class Usuario {
@@ -29,16 +27,14 @@ void seleccionarUsuarioSaldo() {
   text("Seleccione un usuario para cargar saldo:", 100, 50);
 
   
-  if (usuarios.isEmpty()) { // 🔄 CAMBIO: Uso de usuarios.isEmpty()
-    fill(200, 0, 0);
-// Texto en rojo
+  if (usuarios.isEmpty()) { 
+    fill(200, 0, 0); // Texto en rojo
     textAlign(CENTER, CENTER);
     textSize(18);
     text("No hay usuarios registrados.", width/2, 150);
     text("Vaya a la sección 'USUARIOS' para agregar uno.", width/2, 180);
   } else {
     // Dibuja la lista de usuarios
-// 🔄 CAMBIO: Uso de usuarios.size()
     for (int i = 0; i < usuarios.size(); i++) {
       fill(251, 251, 251);
       stroke(0);
@@ -49,12 +45,9 @@ void seleccionarUsuarioSaldo() {
       fill(0);
       textAlign(LEFT, CENTER);
       textSize(16);
-// 🔄 CAMBIO: Acceso a las propiedades del objeto Usuario
       text(usuarios.get(i).nombre + " (UID: " + usuarios.get(i).uid + ")", 110, yBoton + 17);
     }
   }
-
-  
   fill(251, 251, 251);
   rect(500, 300, 130, 40);
   fill(0, 0, 0);
@@ -68,7 +61,7 @@ void pantallaIngresosaldo() {
   fill(0);
   textSize(20);
   textAlign(LEFT, TOP);
-// 🔄 CAMBIO: Acceso a la propiedad 'nombre' del objeto Usuario
+//Acceso a la propiedad 'nombre' del objeto Usuario
   if (usuarioSeleccionadoParaSaldo != -1 && usuarioSeleccionadoParaSaldo < usuarios.size()) {
     text("Ingrese saldo a cargar para: " + usuarios.get(usuarioSeleccionadoParaSaldo).nombre, rectX, rectY);
   } else {
@@ -106,54 +99,32 @@ void stockcuadro(){
   int xInicio = 100;
   int yInicio = 100;
   int anchoTotal = width - 300;
-  // int altoTotal = height - 200;
-// ELIMINADO: Ya no usamos la altura total de la pantalla
-  
   // Definición de columnas
   int col1 = xInicio + 30;
-// N° 
-  int col2 = xInicio + 300;    // Producto
-  // int col3 = xInicio + 700;
-
-
+  int col2 = xInicio + 300;   
   // Definición de filas
   int filaAltura = 30;
-// altura de cada fila
   int yCabecera = yInicio + 40;
-// Esto es y = 140 (línea bajo el título)
-
-  // CAMBIO: Calcular la altura EXACTA para Header (40px) + 2 filas (30px c/u)
   int altoTabla = (yCabecera - yInicio) + (2 * filaAltura);
-// 40 + (2 * 30) = 100px
-  
-  // CAMBIO: Cuadro grande con la altura exacta
+  // Cuadro grande con la altura exacta
   fill(255);
   stroke(0);
   rect(xInicio, yInicio, anchoTotal, altoTabla); // Dibuja el borde exterior
 
-  // CAMBIO: Líneas verticales con la altura exacta
+  // Líneas verticales con la altura exacta
   line(col1, yInicio, col1, yInicio + altoTabla);
   line(col2, yInicio, col2, yInicio + altoTabla);
-
   // Líneas horizontales (Filas)
-  // Dibuja la línea DEBAJO DE LOS TÍTULOS (Crea el espacio para la Fila 1)
   line(xInicio, yCabecera, xInicio + anchoTotal, yCabecera);
-// Dibuja la línea DEBAJO DE LA FILA 1 (Crea el espacio para la Fila 2)
   line(xInicio, yCabecera + filaAltura, xInicio + anchoTotal, yCabecera + filaAltura);
 
-  // porque el borde inferior del 'rect()' la dibuja.
-// line(xInicio, yCabecera + (2 * filaAltura), xInicio + anchoTotal, yCabecera + (2 * filaAltura));
-// Títulos de columnas
   fill(0);
   textAlign(LEFT, CENTER);
   textSize(16);
   text("N°", xInicio + 10, yInicio + 20);
   text("Producto", col1 + 20, yInicio + 20);
   text("Cantidad", col2 + 20, yInicio + 20);
-// --- NUEVO: AÑADIR DATOS A LAS FILAS ---
-  // (Asumo que tienes las variables 'stockActual1' y 'stockActual2'
-  // de la implementación en tiempo real que hicimos antes)
-  
+// ---AÑADIR DATOS A LAS FILAS ---
   // Fila 1
   textAlign(CENTER, CENTER);
 // Centrar el N°
@@ -162,7 +133,6 @@ void stockcuadro(){
 // Alinear Producto a la izquierda
   text("Producto 1", col1 + 20, yCabecera + (filaAltura / 2));
   text(stockActual1, col2 + 20, yCabecera + (filaAltura / 2)); // Muestra el stock
-  
   // Fila 2
   textAlign(CENTER, CENTER);
 // Centrar el N°
@@ -315,7 +285,6 @@ void guardarRegistro(String producto, int precio) {
   String hora = timeFormat.format(ahora);
 // Crea la línea de registro en formato CSV
   String lineaRegistro = fecha + "," + hora + "," + producto + "," + precio;
-// AQUÍ ESTÁ EL BLOQUE 'try' QUE FALTABA
   try {
     FileWriter fw = new FileWriter(dataPath(nombreArchivo), true);
     fw.write(lineaRegistro + "\n");
@@ -351,8 +320,6 @@ void cargarRegistrosVentas() {
   println("✅ Registros históricos cargados: " + registrosEnMemoria.size() + " ventas.");
   archivoCargado = true;
 }
-
-
 
 //Pantalla para cargar archivo
 void pantallaCargarArchivo() {
@@ -404,13 +371,9 @@ void serialEvent(Serial p) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd,HH:mm:ss");
         String fechaHora = dateFormat.format(new Date());
         String lineaRegistro = fechaHora + "," + nombreProducto + "," + precio;
-        
-        // 1.1.
-// GUARDA EN EL ARCHIVO
+       //1.1 GUARDA EN EL ARCHIVO
         guardarRegistro(nombreProducto, precio); 
-        
-        // 1.2.
-// AÑADE AL BUFFER EN MEMORIA (para la tabla VENTAS)
+       // 1.2 AÑADE AL BUFFER EN MEMORIA (para la tabla VENTAS)
         registrosEnMemoria.add(lineaRegistro);
       }
       return; 
@@ -423,13 +386,11 @@ void serialEvent(Serial p) {
       if (partes.length == 2) {
         stockActual1 = int(partes[0]);
         stockActual2 = int(partes[1]);
-        println("Stock actualizado: P1=" + stockActual1 + ", P2=" + stockActual2);
-// Para depuración
+        println("Stock actualizado: P1=" + stockActual1 + ", P2=" + stockActual2); // Para depuración
       }
       return;
-// Termina
     }
-    // 2. Lógica de MENSAJES DE CONTROL/DISPLAY
+    //Lógica de MENSAJES DE CONTROL/DISPLAY
     if (entrada.startsWith("Recibido") || entrada.length() == 0) {
        return;
     }
@@ -516,10 +477,8 @@ text("UID", col2 + 20, yInicio + 20);
   text("Eliminar", width - 110, 245);
   
   // Mostrar cada usuario con su número
-//  CAMBIO: Uso de usuarios.size()
   for (int i = 0; i < usuarios.size(); i++) {
     int y = 140 + i * 30;
-//  CAMBIO: Acceso a las propiedades del objeto Usuario
     textAlign(LEFT, CENTER);
     text(str(i+1), xInicio + 10, y + 20);            // Número de orden
     text(usuarios.get(i).nombre, col1 + 20, y + 20); // Nombre
@@ -527,7 +486,6 @@ text("UID", col2 + 20, yInicio + 20);
     
   }
   
-
    //BOTON VOLVER
   fill(251, 251, 251);
   rect(width - 150, height - 50, 130, 40);
@@ -571,9 +529,7 @@ void eliminarusuario(){
     fill(0);
     textAlign(LEFT, TOP);
     textSize(24);
-// Título/Instrucción
-    text("Ingrese el N° de usuario a eliminar de la lista:", rectX, rectY);
-// Cuadro de entrada de texto (donde se ve 'indiceEliminar')
+    text("Ingrese el N° de usuario a eliminar de la lista:", rectX, rectY); // Cuadro de entrada de texto (donde se ve 'indiceEliminar')
     fill(255);
     rect(rectX, rectY + 40, 100, 40);
     fill(0);
