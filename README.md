@@ -1,10 +1,6 @@
 <!--<em>  MÁQUINA EXPENDEDORA </em>!-->
 # Máquina Expendedora - Trabajo Final Informática II
 
-![Estado](https://img.shields.io/badge/Estado-Finalizado-green)
-![Arduino](https://img.shields.io/badge/Plataforma-Arduino-blue)
-![Processing](https://img.shields.io/badge/Interfaz-Processing-orange)
-
 ## 📋 Descripción
 Este proyecto consiste en el desarrollo de un prototipo de máquina expendedora automatizada. El sistema simula un proceso de venta completo utilizando tecnología RFID para la validación de usuarios y una interfaz gráfica en PC para la administración del sistema.
 
