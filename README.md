@@ -27,7 +27,7 @@ El funcionamiento se distribuye en tres módulos principales:
 3.  **Arduino de Interfaz (UI):** Controla la interacción directa con el cliente mediante un teclado matricial para la selección de productos y una pantalla LCD para mensajes de estado.
 
 ### Diagrama de Conexiones
-![Esquemático del Circuito](img/esquematico.png)
+![Esquemático del Circuito](img/esquematico.png.jpg)
 
 ---
 
